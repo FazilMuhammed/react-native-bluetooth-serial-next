@@ -14,6 +14,8 @@
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
 #import "BLE.h"
+#import "UIImage+Bitmap.h"
+#import "NSData+Base64.h"
 
 typedef void (^RCTBluetoothSerialPeripheralCallback) (CBPeripheral *_Nullable peripheral);
 
