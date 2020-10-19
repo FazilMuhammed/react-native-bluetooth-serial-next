@@ -26,7 +26,7 @@ export const withSubscription = (
 ) => WrappedComponent => {
   const subscriptionName =
     typeof options.subscriptionName === "string" &&
-    options.subscriptionName !== ""
+      options.subscriptionName !== ""
       ? options.subscriptionName
       : "subscription";
   const destroyOnWilUnmount =
@@ -72,6 +72,7 @@ const {
   readFromDevice,
   readUntilDelimiter,
   writeToDevice,
+  writeImageToDevice,
   clear,
   available,
   withDelimiter,
@@ -86,6 +87,7 @@ BluetoothSerial.readFromDevice = (id = null) => readFromDevice(id);
 BluetoothSerial.readUntilDelimiter = (delimiter, id = null) =>
   readUntilDelimiter(delimiter, id);
 BluetoothSerial.writeToDevice = (data, id = null) => writeToDevice(data, id);
+BluetoothSerial.writeImageToDevice = (data, id = null) => writeImageToDevice(data, id);
 BluetoothSerial.clear = (id = null) => clear(id);
 BluetoothSerial.available = (id = null) => available(id);
 BluetoothSerial.withDelimiter = (delimiter, id = null) =>
@@ -160,7 +162,7 @@ BluetoothSerial.device = (id = null) => ({
    * @param {Function} [callback=() => {}]
    * @param {String} [delimiter=""]
    */
-  read: (callback = () => {}, delimiter = "") => {
+  read: (callback = () => { }, delimiter = "") => {
     if (typeof callback !== "function") {
       return;
     }
@@ -194,7 +196,7 @@ BluetoothSerial.device = (id = null) => ({
    * @param {Number} [ms=1000]
    * @param {String} [delimiter=""]
    */
-  readEvery: (callback = () => {}, ms = 1000, delimiter = "") => {
+  readEvery: (callback = () => { }, ms = 1000, delimiter = "") => {
     if (typeof callback !== "function") {
       return;
     }
@@ -246,7 +248,19 @@ BluetoothSerial.device = (id = null) => ({
    * @param {String} data
    * @return {Promise<Boolean>}
    */
-  writeToDevice: data => BluetoothSerial.writeToDevice(data, id)
+  writeToDevice: data => BluetoothSerial.writeToDevice(data, id),
+
+
+  writeImage: data => {
+    if (typeof data === "string") {
+      data = new Buffer(data);
+    }
+    return BluetoothSerial.writeImageToDevice(data.toString("base64"), id);
+  },
+
+
+  writeImageToDevice: data => BluetoothSerial.writeImageToDevice(data, id),
+
 });
 
 /**
@@ -379,7 +393,7 @@ BluetoothSerial.readOnce = (delimiter = "", id = null) =>
  * @param {String} [id]
  */
 BluetoothSerial.readEvery = (
-  callback = () => {},
+  callback = () => { },
   ms = 1000,
   delimiter = "",
   id = null
@@ -412,5 +426,14 @@ BluetoothSerial.write = (data, id = null) => {
   }
   return BluetoothSerial.writeToDevice(data.toString("base64"), id);
 };
+BluetoothSerial.writeImage = (data, id = null) => {
+  if (typeof data === "string") {
+    data = new Buffer(data);
+  }
+
+  return BluetoothSerial.writeImageToDevice(data.toString("base64"), id);
+}
+
+
 
 export default BluetoothSerial;
