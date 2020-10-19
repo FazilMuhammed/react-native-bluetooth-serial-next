@@ -15,6 +15,12 @@
 
 @implementation RCTBluetoothSerial
 
+typedef NS_ENUM(NSInteger, HLTextAlignment) {
+    HLTextAlignmentLeft = 0x00,
+    HLTextAlignmentCenter = 0x01,
+    HLTextAlignmentRight = 0x02
+};
+
 
 RCT_EXPORT_MODULE();
 
@@ -33,7 +39,7 @@ RCT_EXPORT_MODULE();
         _connectionPromises = [NSMutableDictionary dictionary];
         _doesHaveListeners = FALSE;
         
-        _ble = [BLE sharedInstance];
+        _ble = [[BLE alloc] init];
         [_ble setDelegate:self];
     }
     return self;
@@ -46,10 +52,10 @@ RCT_EXPORT_MODULE();
     return dispatch_get_main_queue();
 }
 
-// + (BOOL)requiresMainQueueSetup
-// {
-//     return NO;
-// }
++ (BOOL)requiresMainQueueSetup
+{
+    return NO;
+}
 
 /*----------------------------------------------------*/
 #pragma mark - React Native Methods Available in Javascript -
@@ -404,6 +410,72 @@ RCT_EXPORT_METHOD(writeToDevice:(NSString *)message
     resolve((id)kCFBooleanTrue);
 }
 
+
+
+RCT_EXPORT_METHOD(writeImageToDevice:(NSString *)message
+ uuid:(NSString *)uuid
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejector:(RCTPromiseRejectBlock)reject)
+{
+    NSLog(@"writeImageToDevice.................");
+    if (message != nil) {
+        NSData *data = [[NSData alloc] initWithBase64EncodedString:message
+                                                           options:NSDataBase64DecodingIgnoreUnknownCharacters];
+        UIImage *image = [UIImage imageWithData:data];
+
+        [self printImage:image address:uuid alignment:HLTextAlignmentLeft maxWidth:280];
+
+
+        resolve((id)kCFBooleanTrue);
+    } else {
+        NSError *err = nil;
+        reject(@"no_data", @"Data was null", err);
+    }
+}
+
+
+
+
+- (void) printImage:(UIImage *)image address:(NSString *)uuid alignment:(HLTextAlignment)alignment maxWidth:(CGFloat)maxWidth {
+    // 1.设置对齐方式
+    NSLog(@"1.设置对齐方式");
+    Byte alignBytes[] = {0x1B,0x61,alignment};
+    NSData *data = [[[NSData alloc] init] initWithBytes:alignBytes length:sizeof(alignBytes)];
+    [self.ble write:uuid data:data];
+    
+    // 2.换行
+    NSLog(@"2.换行");
+    Byte nextRowBytes[] = {0x0A};
+    NSData *newLine = [[[NSData alloc] init] initWithBytes:nextRowBytes length:sizeof(nextRowBytes)];
+
+    // 换行次数
+    for (int i = 0; i < 2; ++i) {
+        [self.ble write:uuid data:newLine];
+    }
+    
+
+    
+    // 3.设置图片打印
+    NSLog(@"3.设置图片打印");
+    
+  
+  
+    UIImage *newImage = [image imageWithscaleMaxWidth:maxWidth];
+    NSData *imageData = [newImage bitmapData];
+    [self.ble write:uuid data:imageData];
+    
+    // 4.打印图片后，恢复文字的行间距
+    NSLog(@"4.打印图片后，恢复文字的行间距");
+    Byte lineSpace[] = {0x1B,0x32};
+    NSData *restoreTextSpace = [[[NSData alloc] init] initWithBytes:lineSpace length:sizeof(lineSpace)];
+    [self.ble write:uuid data:restoreTextSpace ];
+    
+    for (int i = 0; i < 8; ++i) {
+        [self.ble write:uuid data:newLine];
+    }
+}
+
+
 RCT_EXPORT_METHOD(readFromDevice:(NSString *)uuid
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejector:(RCTPromiseRejectBlock)reject)
@@ -693,3 +765,5 @@ RCT_EXPORT_METHOD(readUntilDelimiter:(NSString *)delimiter
 }
 
 @end
+
+
