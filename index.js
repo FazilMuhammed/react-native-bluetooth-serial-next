@@ -81,7 +81,9 @@ const {
   setServices
 } = BluetoothSerial;
 
-BluetoothSerial.disconnect = (id = null) => disconnect(id);
+BluetoothSerial.disconnect = (id = null) => disconnect(id)
+
+// BluetoothSerial.disconnect = (id = null) => disconnect(id);
 BluetoothSerial.isConnected = (id = null) => isConnected(id);
 BluetoothSerial.readFromDevice = (id = null) => readFromDevice(id);
 BluetoothSerial.readUntilDelimiter = (delimiter, id = null) =>
@@ -252,10 +254,12 @@ BluetoothSerial.device = (id = null) => ({
 
 
   writeImage: data => {
-    if (typeof data === "string") {
-      data = new Buffer(data);
-    }
-    return BluetoothSerial.writeImageToDevice(data.toString("base64"), id);
+    // console.log(typeof data, "Superman")
+    // if (typeof data === "string") {
+    //   data = new Buffer(data);
+    // }
+    // console.log(data, "Buffer")
+    return BluetoothSerial.writeImageToDevice(data, id);
   },
 
 
@@ -420,19 +424,22 @@ BluetoothSerial.readEvery = (
  * @param  {String} [id]
  * @return {Promise<Boolean>}
  */
-BluetoothSerial.write = (data, id = null) => {
-  if (typeof data === "string") {
-    data = new Buffer(data);
-  }
-  return BluetoothSerial.writeToDevice(data.toString("base64"), id);
-};
-BluetoothSerial.writeImage = (data, id = null) => {
-  if (typeof data === "string") {
-    data = new Buffer(data);
-  }
+// BluetoothSerial.write = (data, id = null) => {
+//   if (typeof data === "string") {
+//     data = new Buffer(data);
+//   }
+//   return BluetoothSerial.writeToDevice(data.toString("base64"), id);
+// };
+// BluetoothSerial.writeImage = (data, id = null) => {
+//   debugger
+//   console.log(data, "data");
+//   console.log(id, "id")
+//   if (typeof data === "string") {
+//     data = new Buffer(data);
+//   }
 
-  return BluetoothSerial.writeImageToDevice(data.toString("base64"), id);
-}
+//   return BluetoothSerial.writeImageToDevice(data.toString("base64"), id);
+// }
 
 
 

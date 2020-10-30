@@ -417,13 +417,20 @@ RCT_EXPORT_METHOD(writeImageToDevice:(NSString *)message
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejector:(RCTPromiseRejectBlock)reject)
 {
-    NSLog(@"writeImageToDevice.................");
+    NSLog(@"writeImageToDevice................. %@",message);
+     NSLog(@"writeImageToDevice uuid............... %@",uuid);
+
     if (message != nil) {
         NSData *data = [[NSData alloc] initWithBase64EncodedString:message
                                                            options:NSDataBase64DecodingIgnoreUnknownCharacters];
-        UIImage *image = [UIImage imageWithData:data];
 
-        [self printImage:image address:uuid alignment:HLTextAlignmentLeft maxWidth:280];
+        NSLog(@"message data  %@", data);
+        UIImage *image = [UIImage imageWithData:data];
+//        UIImage *image = [UIImage imageWithData:data];
+
+        NSLog(@"Image %@", image);
+
+    [self printImage:image address:uuid alignment:HLTextAlignmentCenter maxWidth:350];
 
 
         resolve((id)kCFBooleanTrue);
@@ -437,40 +444,45 @@ RCT_EXPORT_METHOD(writeImageToDevice:(NSString *)message
 
 
 - (void) printImage:(UIImage *)image address:(NSString *)uuid alignment:(HLTextAlignment)alignment maxWidth:(CGFloat)maxWidth {
-    // 1.设置对齐方式
-    NSLog(@"1.设置对齐方式");
+    // 1.Set alignment
+    NSLog(@"Image %@", image);
+  NSLog(@"uuid %@", uuid);
+    // NSLog(@"alignment %lid", (long)alignment);
+    // NSLog(@"maxWidth %f", maxWidth);
+    NSLog(@"1.Set alignment");
     Byte alignBytes[] = {0x1B,0x61,alignment};
     NSData *data = [[[NSData alloc] init] initWithBytes:alignBytes length:sizeof(alignBytes)];
     [self.ble write:uuid data:data];
     
-    // 2.换行
-    NSLog(@"2.换行");
+    // 2.Wrap
+    NSLog(@"2.Wrap");
     Byte nextRowBytes[] = {0x0A};
     NSData *newLine = [[[NSData alloc] init] initWithBytes:nextRowBytes length:sizeof(nextRowBytes)];
 
-    // 换行次数
+    // Number of line breaks
     for (int i = 0; i < 2; ++i) {
         [self.ble write:uuid data:newLine];
     }
     
 
     
-    // 3.设置图片打印
-    NSLog(@"3.设置图片打印");
-    
-  
-  
-    UIImage *newImage = [image imageWithscaleMaxWidth:maxWidth];
+    // 3.Set up picture printing
+    NSLog(@"Set up picture printing");
+    UIImage *newImage = [image imageWithscaleMaxWidth: maxWidth];
     NSData *imageData = [newImage bitmapData];
+    // UIImage *newImage = [image imageWithscaleMaxWidth:maxWidth];
+    // NSData *imageData = [newImage bitmapData];
+
+    NSLog(@"imageData", imageData);
     [self.ble write:uuid data:imageData];
     
-    // 4.打印图片后，恢复文字的行间距
-    NSLog(@"4.打印图片后，恢复文字的行间距");
+    // 4.After printing the picture, restore the line spacing of the text
+    NSLog(@"4.After printing the picture Restore text line spacing");
     Byte lineSpace[] = {0x1B,0x32};
     NSData *restoreTextSpace = [[[NSData alloc] init] initWithBytes:lineSpace length:sizeof(lineSpace)];
     [self.ble write:uuid data:restoreTextSpace ];
     
-    for (int i = 0; i < 8; ++i) {
+    for (int i = 0; i < 3; ++i) {
         [self.ble write:uuid data:newLine];
     }
 }
@@ -765,5 +777,6 @@ RCT_EXPORT_METHOD(readUntilDelimiter:(NSString *)delimiter
 }
 
 @end
+
 
 

@@ -312,3 +312,4 @@ typedef void (^CentralManagerDiscoverPeripheralsCallback) (NSMutableArray *perip
 - (NSArray *)includeDefaultServices:(NSArray *)services;
 
 @end
+

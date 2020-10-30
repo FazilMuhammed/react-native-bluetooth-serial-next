@@ -61,3 +61,4 @@ typedef void (^RCTBluetoothSerialPeripheralCallback) (CBPeripheral *_Nullable pe
 - (void)bluetoothPowerStateTimer:(NSTimer *)timer;
 
 @end
+

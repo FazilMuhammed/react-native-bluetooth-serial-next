@@ -173,6 +173,7 @@
 - (UIImage *)imageWithscaleMaxWidth:(CGFloat)maxWidth
 {
     CGFloat width = self.size.width;
+    NSLog(@"Fazil Muhammed");
     if (width > maxWidth)
     {
         CGFloat height = self.size.height;
@@ -182,6 +183,7 @@
         UIGraphicsBeginImageContext(size);
         [self drawInRect:CGRectMake(0, 0, maxWidth, maxHeight)];
         UIImage *resultImage = UIGraphicsGetImageFromCurrentImageContext();
+        NSLog(@"resultImage", resultImage);
         UIGraphicsEndImageContext();
         return resultImage;
     }
@@ -330,5 +332,6 @@ void ProviderReleaseData (void *info, const void *data, size_t size){
 }
 
 @end
+
 
 
